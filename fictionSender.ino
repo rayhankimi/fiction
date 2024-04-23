@@ -3,11 +3,11 @@
 #include "addons/TokenHelper.h"
 #include "addons/RTDBHelper.h"
 
-#define WIFI_SSID "Anak kos"
-#define WIFI_PASS "22445588"
+#define WIFI_SSID "Your SSID"
+#define WIFI_PASS "Your Password"
 
-#define API_KEY "AIzaSyDCi4PCgn12zaD1yjJhtUW0u-_WRBEUU0Q"
-#define DATABASE_URL "pringgaxi-default-rtdb.asia-southeast1.firebasedatabase.app"
+#define API_KEY "API Key from RTDB"
+#define DATABASE_URL "RTDB link w/o https and /"
 
 FirebaseData fbdo;
 FirebaseAuth auth;
