@@ -7,11 +7,12 @@
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-#define WIFI_SSID "Your SSID"
-#define WIFI_PASS "Your Password"
+#define WIFI_SSID "Anak kos"
+#define WIFI_PASS "22445588"
 
-#define API_KEY "API Key from RTDB"
-#define DATABASE_URL "RTDB link w/o https and /"
+#define API_KEY "AIzaSyDCi4PCgn12zaD1yjJhtUW0u-_WRBEUU0Q"
+#define DATABASE_URL "pringgaxi-default-rtdb.asia-southeast1.firebasedatabase.app"
+
 
 FirebaseData fbdo;
 FirebaseAuth auth;
@@ -22,23 +23,26 @@ String databasePath;
 String ldrPath;
 
 unsigned long sendDataPrevMillis = 0;
-unsigned long lastTrafficUpdate = 0;
+unsigned long lastTrafficUpdate1 = 0;
+unsigned long lastTrafficUpdate2 = 0;
 
 bool sensorState = false;
 int trafficRate = 1;
-int interval = 10000; //EVERYTHING IN FIREBASE WILL REFRESH FOR EVERY MS YOU PUT IN INTERVAL
+int interval = 1000; //EVERYTHING IN FIREBASE WILL REFRESH FOR EVERY MS YOU PUT IN INTERVAL
 
-String noTraffic = "Jalan Lancar";
-String light = "Macet Ringan";
-String medium = "Macet Sedang";
-String heavy = "Macet Berat";
-String extreme = "Macet Parah";
+String noTraffic = "Jln Lancar";
+String light = "Mct Ringan";
+String medium = "Mct Sedang";
+String heavy = "Mct Tinggi";
+String severe = "Mct Parah";
+String extreme = "Mct Eksrim";
 
-String messageNoTraffic = "Silahkan Lewat";
-String messageLight = "Tetap Waspada";
+String messageNoTraffic = "-";
+String messageLight = "-";
 String messageMedium = "Waspada";
 String messageHeavy = "Hindari";
-String messageExtreme = "Gnkn Jln Lain";
+String messageSevere = "Hindari";
+String messageExtreme = "Gunakan Jln Lain";
 
 void initWifi(){
   WiFi.begin(WIFI_SSID, WIFI_PASS);
@@ -78,7 +82,7 @@ void setup() {
 
 
 void loop() {
-  if (Firebase.ready() && (millis() - sendDataPrevMillis > interval || sendDataPrevMillis == 0)) {
+  if (Firebase.ready() && (millis() - sendDataPrevMillis > 1000 || sendDataPrevMillis == 0)) {
     sendDataPrevMillis = millis();
     if (Firebase.RTDB.getInt(&fbdo, "/UsersData/LDR")) {
       if (fbdo.dataType() == "int") {
@@ -88,16 +92,22 @@ void loop() {
             sensorState = false;
             Serial.println("No Traffic Detected");
           }
+          if (trafficRate > 4){
+          unsigned long currentMillis1 = micros();
+          if (currentMillis1 - lastTrafficUpdate1 > 0) {
+            lastTrafficUpdate1 = currentMillis1;
+            trafficRate = trafficRate - 3; }
+        }
         } else {
           if (sensorState == false) {
             sensorState = true;
             Serial.println("Sensor Blocked, Traffic Rate may Arise");
           }
           // Tambahkan delay sebelum menambah traffic rate agar sesuai dengan kebutuhan (10 detik)
-          unsigned long currentMillis = millis();
-          if (currentMillis - lastTrafficUpdate >= 10000) {
-            lastTrafficUpdate = currentMillis;
-            trafficRate++; // Tambahkan 1 setiap 10 detik
+          unsigned long currentMillis2 = micros();
+          if (currentMillis2 - lastTrafficUpdate2 > 0) {
+            lastTrafficUpdate2 = currentMillis2;
+            trafficRate = trafficRate + 1; 
           }
         }
       }
@@ -108,43 +118,63 @@ void loop() {
 
 
     // Menggunakan rentang nilai untuk menentukan traffic rate
-    if (trafficRate >= 1 && trafficRate <= 3)
+    if (trafficRate >= 1 && trafficRate <= 30)
     {
         lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print(noTraffic);
+        lcd.setCursor(12,0);
+        lcd.print(trafficRate);
         lcd.setCursor(0, 1);
         lcd.print(messageNoTraffic);
     }
-    else if (trafficRate >= 4 && trafficRate <= 6)
+    else if (trafficRate >= 31 && trafficRate <= 60)
     {
         lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print(light);
+        lcd.setCursor(12,0);
+        lcd.print(trafficRate);
         lcd.setCursor(0, 1);
         lcd.print(messageLight);
     }
-    else if (trafficRate >= 7 && trafficRate <= 8)
+    else if (trafficRate >= 61 && trafficRate <= 120)
     {
         lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print(medium);
+        lcd.setCursor(12,0);
+        lcd.print(trafficRate);
         lcd.setCursor(0, 1);
         lcd.print(messageMedium);
     }
-    else if (trafficRate >= 9 && trafficRate <= 11)
+    else if (trafficRate >= 121 && trafficRate <= 240)
     {
         lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print(heavy);
+        lcd.setCursor(12,0);
+        lcd.print(trafficRate);
         lcd.setCursor(0, 1);
         lcd.print(messageHeavy);
     }
-    else if (trafficRate >= 12)
+  else if (trafficRate >= 241 && trafficRate <= 600)
+    {
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print(severe);
+        lcd.setCursor(12,0);
+        lcd.print(trafficRate);
+        lcd.setCursor(0, 1);
+        lcd.print(messageSevere);
+    }
+    else if (trafficRate >= 601)
     {
         lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print(extreme);
+        lcd.setCursor(12,0);
+        lcd.print(trafficRate);
         lcd.setCursor(0, 1);
         lcd.print(messageExtreme);
     }
@@ -156,8 +186,5 @@ void loop() {
         lcd.setCursor(0, 1);
         lcd.print("Error");
     }
-    Serial.print("Traffic Rate :");
-    Serial.println(trafficRate);
     delay(1000); // Delay tambahan untuk stabilisasi tampilan LCD
 }
-
