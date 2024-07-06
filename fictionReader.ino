@@ -7,11 +7,11 @@
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-#define WIFI_SSID "Anak kos"
-#define WIFI_PASS "22445588"
+#define WIFI_SSID "WifiSSID"
+#define WIFI_PASS "password"
 
-#define API_KEY "AIzaSyDCi4PCgn12zaD1yjJhtUW0u-_WRBEUU0Q"
-#define DATABASE_URL "pringgaxi-default-rtdb.asia-southeast1.firebasedatabase.app"
+#define API_KEY "yOurSecRetaPiKeY"
+#define DATABASE_URL "YourFirebaseRTDB-rtdb.asia-southeast1.firebasedatabase.app"
 
 
 FirebaseData fbdo;
